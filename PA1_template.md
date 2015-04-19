@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-html_document:
-keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 data_full <- read.csv("activity.csv")
 ```
 
@@ -16,100 +12,117 @@ data_full <- read.csv("activity.csv")
 
 Histogram of the total number of steps taken each day:
 
-```{r}
+
+```r
 data <- na.omit(data_full)
 steps_per_day <- aggregate(steps ~ date, data, sum)
 hist(steps_per_day$steps, main="Steps per Day", xlab="Steps", col=rgb(255, 37, 0, maxColorValue=255));
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
 Mean of the total numbers of steps per day:
 
-```{r}
+
+```r
 mean(steps_per_day$steps)
 ```
 
+```
+## [1] 10766.19
+```
+        
 Median of the total numbers of steps per day:
 
-```{r}
+
+```r
 median(steps_per_day$steps)
 ```
 
+```
+## [1] 10765
+```
+
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 avg_steps_per_interval <- aggregate(steps ~ interval, data, mean)
 y <- avg_steps_per_interval$steps;
 x <- avg_steps_per_interval$interval;
 plot(x, y, type="l", ylab="Steps (average)", xlab="Interval");
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 5-minute interval (on average across all the days in the dataset) wich contains the maximum number of steps:
 
-```{r}
+
+```r
 max_index <- which.max(avg_steps_per_interval$steps)
 avg_steps_per_interval[max_index,]$interval
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
 Total number of missing values in the dataset: 
 
-```{r}
+
+```r
 nas <- data_full[is.na(data_full$steps), ]
 nrow(nas)
 ```
 
+```
+## [1] 2304
+```
+
 Filling in all of the NAs with the average value of steps of each interval: 
-```{r}
+
+```r
 data_filled <- data_full
 for (i in 1:nrow(data_filled))  {
         if(is.na(data_filled[i, ]$steps)){
                 data_filled[i, ]$steps <- avg_steps_per_interval[avg_steps_per_interval$interval == data_filled[i, ]$interval, ]$steps
-                }
         }
+}
 ```
 
 Histogram of the total number of steps taken each day (using the dataset filled previously):
 
-```{r}
+
+```r
 steps_per_day_filled <- aggregate(steps ~ date, data_filled, sum)
 hist(steps_per_day_filled$steps, main="Steps per Day (filled dataset)", xlab="Steps", col=rgb(255, 37, 0, maxColorValue=255));
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+
 Mean of the total numbers of steps per day (using the dataset filled previously):
 
-```{r}
+
+```r
 mean(steps_per_day_filled$steps)
 ```
 
+```
+## [1] 10766.19
+```
+        
 Median of the total numbers of steps per day (using the dataset filled previously):
 
-```{r}
+
+```r
 median(steps_per_day_filled$steps)
 ```
 
-The value of the mean does not differ from the estimated value in the first part of the assignment.
-The value of the median differs from the estimated value in the first part of the assignment.
+```
+## [1] 10766.19
+```
 
-By imputing missing data on the estimates of the total daily number of steps, the precision of the analysis can be compromised.
-
+```r
 ## Are there differences in activity patterns between weekdays and weekends?
-
-```{r}
-library(lattice)
-Sys.setlocale("LC_TIME", "English");
-par(mfrow = c(2,1));
-criteria <- weekdays(as.Date(data_filled$date)) == "Saturday" | weekdays(as.Date(data_filled$date)) == "Sunday"
-data_filled$day <- ifelse(criteria,"weekend", "weekday")
-data_filled$day <- as.factor(data_filled$day)
-avg_steps_per_interval_filled_weekend <- aggregate(steps ~ interval, data_filled[data_filled$day == "weekend", ], mean)
-avg_steps_per_interval_filled_weekday <- aggregate(steps ~ interval, data_filled[data_filled$day == "weekday", ], mean)
-avg_steps_per_interval_filled_weekend$day <- "weekend"
-avg_steps_per_interval_filled_weekday$day <- "weekday"
-final <- rbind(avg_steps_per_interval_filled_weekend, avg_steps_per_interval_filled_weekday)
-final$day <- as.factor(final$day)
-xyplot(steps~interval|day,       
-       data = final,      
-       type="l",        
-       layout=c(1,2), 
-       xlab=list(label="Interval", cex=0.75), ylab=list(label="Steps",cex=0.75), scales=list(cex=0.5), lwd=0.1)
 ```
