@@ -85,7 +85,8 @@ nrow(nas)
 ## [1] 2304
 ```
 
-Filling in all of the NAs with the average value of steps of each interval: 
+STRATEGY for inputing missing data - filling in all of the NAs with the average value of steps of each interval: 
+
 
 ```r
 data_filled <- data_full
