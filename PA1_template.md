@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+html_document:
+keep_md: true
+---
 
 
 ## Loading and preprocessing the data
@@ -19,7 +24,7 @@ steps_per_day <- aggregate(steps ~ date, data, sum)
 hist(steps_per_day$steps, main="Steps per Day", xlab="Steps", col=rgb(255, 37, 0, maxColorValue=255));
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
 
 Mean of the total numbers of steps per day:
 
@@ -31,7 +36,7 @@ mean(steps_per_day$steps)
 ```
 ## [1] 10766.19
 ```
-        
+
 Median of the total numbers of steps per day:
 
 
@@ -52,7 +57,7 @@ x <- avg_steps_per_interval$interval;
 plot(x, y, type="l", ylab="Steps (average)", xlab="Interval");
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
 5-minute interval (on average across all the days in the dataset) wich contains the maximum number of steps:
 
@@ -87,8 +92,8 @@ data_filled <- data_full
 for (i in 1:nrow(data_filled))  {
         if(is.na(data_filled[i, ]$steps)){
                 data_filled[i, ]$steps <- avg_steps_per_interval[avg_steps_per_interval$interval == data_filled[i, ]$interval, ]$steps
+                }
         }
-}
 ```
 
 Histogram of the total number of steps taken each day (using the dataset filled previously):
@@ -99,7 +104,7 @@ steps_per_day_filled <- aggregate(steps ~ date, data_filled, sum)
 hist(steps_per_day_filled$steps, main="Steps per Day (filled dataset)", xlab="Steps", col=rgb(255, 37, 0, maxColorValue=255));
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 Mean of the total numbers of steps per day (using the dataset filled previously):
 
@@ -111,7 +116,7 @@ mean(steps_per_day_filled$steps)
 ```
 ## [1] 10766.19
 ```
-        
+
 Median of the total numbers of steps per day (using the dataset filled previously):
 
 
@@ -123,6 +128,39 @@ median(steps_per_day_filled$steps)
 ## [1] 10766.19
 ```
 
-```r
+The value of the mean does not differ from the estimated value in the first part of the assignment.
+The value of the median differs from the estimated value in the first part of the assignment.
+
+By imputing missing data on the estimates of the total daily number of steps, the precision of the analysis can be compromised.
+
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+```r
+library(lattice)
+Sys.setlocale("LC_TIME", "English");
 ```
+
+```
+## [1] "English_United States.1252"
+```
+
+```r
+par(mfrow = c(2,1));
+criteria <- weekdays(as.Date(data_filled$date)) == "Saturday" | weekdays(as.Date(data_filled$date)) == "Sunday"
+data_filled$day <- ifelse(criteria,"weekend", "weekday")
+data_filled$day <- as.factor(data_filled$day)
+avg_steps_per_interval_filled_weekend <- aggregate(steps ~ interval, data_filled[data_filled$day == "weekend", ], mean)
+avg_steps_per_interval_filled_weekday <- aggregate(steps ~ interval, data_filled[data_filled$day == "weekday", ], mean)
+avg_steps_per_interval_filled_weekend$day <- "weekend"
+avg_steps_per_interval_filled_weekday$day <- "weekday"
+final <- rbind(avg_steps_per_interval_filled_weekend, avg_steps_per_interval_filled_weekday)
+final$day <- as.factor(final$day)
+xyplot(steps~interval|day,       
+       data = final,      
+       type="l",        
+       layout=c(1,2), 
+       xlab=list(label="Interval", cex=0.75), ylab=list(label="Steps",cex=0.75), scales=list(cex=0.5), lwd=0.1)
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
